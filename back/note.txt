@@ -1,0 +1,7 @@
+users:
+last_name, first_name, email, role, device, password
+
+userprofile:
+login -> email, password
+reset-password -> email
+reset-password-confirm -> password
