@@ -16,7 +16,7 @@ from django.core.mail import send_mail
 
 from .models import User
 from .serializers import UserLoginSerializer, UserRegisterSerializer, PasswordChangeSerializer, \
-    PasswordResetRequestSerializer, PasswordResetConfirmSerializer
+    PasswordResetRequestSerializer, PasswordResetConfirmSerializer, UserInfoChangeSerializer
 
 
 # Create your views here.
@@ -30,15 +30,16 @@ class LogInApiView(TokenObtainPairView):
         serializer = UserLoginSerializer(data=self.request.data, context={'request': self.request})
 
         # Validate input data
-        if not serializer.is_valid():
-            return Response(
-                {
-                    'status': 'error',
-                    'code': status.HTTP_400_BAD_REQUEST,
-                    'errors': serializer.errors
-                },
-                status=status.HTTP_400_BAD_REQUEST
-            )
+        serializer.is_valid(raise_exception=True)
+        # if not serializer.is_valid():
+        #     return Response(
+        #         {
+        #             'status': 'error',
+        #             'code': status.HTTP_400_BAD_REQUEST,
+        #             'errors': serializer.errors
+        #         },
+        #         status=status.HTTP_400_BAD_REQUEST
+        #     )
 
         # Authenticate user
         user = serializer.validated_data['user']
@@ -134,7 +135,6 @@ class PasswordChangeApiView(GenericAPIView):
 
 class PasswordResetRequestView(GenericAPIView):
     serializer_class = PasswordResetRequestSerializer
-    permission_classes = []
 
     def post(self, request, *args, **kwargs):
         serializer = self.get_serializer(data=request.data)
@@ -169,7 +169,6 @@ class PasswordResetRequestView(GenericAPIView):
 
 class PasswordResetConfirmView(GenericAPIView):
     serializer_class = PasswordResetConfirmSerializer
-    permission_classes = []
 
     def post(self, request, *args, **kwargs):
         serializer = self.get_serializer(data=request.data)
@@ -192,3 +191,14 @@ class PasswordResetConfirmView(GenericAPIView):
             {"detail": "Password has been reset successfully."},
             status=status.HTTP_200_OK
         )
+
+
+@permission_classes([IsAuthenticated])
+class UserInfoChangeView(GenericAPIView):
+    serializer_class = UserInfoChangeSerializer
+
+    def post(self, request, *args, **kwargs):
+        serializer = self.get_serializer(data=request.data)
+        serializer.is_valid(raise_exception=True)
+        serializer.save()
+

@@ -124,3 +124,18 @@ class PasswordResetConfirmSerializer(serializers.Serializer):
             raise serializers.ValidationError({"new_password": list(e.messages)})
 
         return data
+
+
+class UserInfoChangeSerializer(serializers.ModelSerializer):
+    class Meta:
+        model = User
+        fields = ['email', 'username', 'first_name', 'last_name']
+
+    def save(self):
+        user = self.context['request'].user
+        user.email = self.validated_data['email']
+        user.username = self.validated_data['username']
+        user.first_name = self.validated_data['first_name']
+        user.last_name = self.validated_data['last_name']
+        user.save()
+        return user
