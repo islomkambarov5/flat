@@ -30,16 +30,15 @@ class LogInApiView(TokenObtainPairView):
         serializer = UserLoginSerializer(data=self.request.data, context={'request': self.request})
 
         # Validate input data
-        serializer.is_valid(raise_exception=True)
-        # if not serializer.is_valid():
-        #     return Response(
-        #         {
-        #             'status': 'error',
-        #             'code': status.HTTP_400_BAD_REQUEST,
-        #             'errors': serializer.errors
-        #         },
-        #         status=status.HTTP_400_BAD_REQUEST
-        #     )
+        if not serializer.is_valid():
+            return Response(
+                {
+                    'status': 'error',
+                    'code': status.HTTP_400_BAD_REQUEST,
+                    'errors': serializer.errors
+                },
+                status=status.HTTP_400_BAD_REQUEST
+            )
 
         # Authenticate user
         user = serializer.validated_data['user']
@@ -63,7 +62,6 @@ class LogInApiView(TokenObtainPairView):
             'user': {
                 'id': user.id,
                 'email': user.email,
-                'username': user.username
             }
         }, status=status.HTTP_200_OK)
 
@@ -96,7 +94,6 @@ class RegisterView(GenericAPIView):
                     'user': {
                         'id': user.id,
                         'email': user.email,
-                        'username': user.username
                     }
                 },
                 status=status.HTTP_201_CREATED
@@ -128,7 +125,6 @@ class PasswordChangeApiView(GenericAPIView):
             "message": "Password updated successfully",
             "data": {
                 "email": user.email,
-                "username": user.username
             }
         })
 

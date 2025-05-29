@@ -22,8 +22,11 @@ class UserLoginSerializer(serializers.Serializer):
         password = attrs.get('password')
 
         if email and password:
-            user = authenticate(request=self.context.get('request'),
-                                email=email, password=password)
+            user = authenticate(
+                request=self.context.get('request'),
+                email=email,
+                password=password
+            )
 
             if not user:
                 msg = 'Unable to log in with provided credentials.'
@@ -41,7 +44,7 @@ class UserRegisterSerializer(serializers.ModelSerializer):
 
     class Meta:
         model = User
-        fields = ['email', 'username', 'password', 'password2', 'first_name', 'last_name']
+        fields = ['email', 'password', 'password2', 'first_name', 'last_name']
         extra_kwargs = {
             'password': {'write_only': True},
             'first_name': {'required': False},
@@ -129,12 +132,11 @@ class PasswordResetConfirmSerializer(serializers.Serializer):
 class UserInfoChangeSerializer(serializers.ModelSerializer):
     class Meta:
         model = User
-        fields = ['email', 'username', 'first_name', 'last_name']
+        fields = ['email', 'first_name', 'last_name']
 
     def save(self):
         user = self.context['request'].user
         user.email = self.validated_data['email']
-        user.username = self.validated_data['username']
         user.first_name = self.validated_data['first_name']
         user.last_name = self.validated_data['last_name']
         user.save()
